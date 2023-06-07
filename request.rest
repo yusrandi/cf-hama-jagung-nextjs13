@@ -1,0 +1,81 @@
+
+# HAMA
+
+###
+GET http://localhost:3000/api/hama
+
+###
+POST http://localhost:3000/api/hama
+Content-Type: application/json
+
+{
+    "hamaCode": "H3",
+    "hamaName": "Hama 3"
+}
+
+###
+GET http://localhost:3000/api/hama/1
+###
+DELETE  http://localhost:3000/api/hama/3
+
+###
+PATCH  http://localhost:3000/api/hama/1
+Content-Type: application/json
+
+{
+    "hamaCode": "H1",
+    "hamaName": "Hama 1"
+}
+
+###
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+    "name": "use",
+    "email": "use@use.use",
+    "password": "1sampai8"
+}
+
+###
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+    "username": "use@use.use",
+    "password": "1sampai8"
+}
+
+###
+POST http://localhost:3000/api/post
+Content-Type: application/json
+
+{
+    "title": "Hello Hello Bandung",
+    "authorId": 1
+}
+###
+PATCH    http://localhost:3000/api/kerusakan/8
+Content-Type: application/json
+
+{
+    "kerusakanCode": "K10",
+    "kerusakanName": "Kerusakan 10 Updated"
+}
+
+###
+DELETE    http://localhost:3000/api/kerusakan/K003
+
+# EVIDENCE
+
+###
+GET  http://localhost:3000/api/evidence
+###
+POST    http://localhost:3000/api/evidence
+Content-Type: application/json
+
+{
+    "evidenceCode": "G2",
+    "evidenceName": "Gejala 2",
+    "evidenceBobot": "0.8"
+}

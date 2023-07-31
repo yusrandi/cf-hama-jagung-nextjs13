@@ -4,6 +4,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
+import { Role } from 'prisma/prisma-client';
 import React, { useState } from 'react'
 
 export default function Navbar() {
@@ -27,14 +28,26 @@ export default function Navbar() {
                     session?.user ?
                         (
                             <div className='flex gap-3 md:gap-5 items-center'>
+                                {
+                                    session.user.role !== Role.USER ?
 
+                                        <>
+                                            <Link href='/hama' className={`${pathname === '/hama' || pathname === '/hama/create' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
+                                                Hama
+                                            </Link>
+                                            <Link href='/evidence' className={`${pathname === '/evidence' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
+                                                Evidence
+                                            </Link>
 
-                                <Link href='/evidence' className={`${pathname === '/evidence' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
-                                    Evidence
-                                </Link>
-                                <Link href='/hama' className={`${pathname === '/hama' || pathname === '/hama/create' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
-                                    Hama
-                                </Link>
+                                            <Link href='/user' className={`${pathname === '/user' || pathname === '/user/create' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
+                                                Pengguna
+                                            </Link>
+                                            <Link href='/konsultasi' className={`${pathname === '/konsultasi' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
+                                                Konsultasi
+                                            </Link>
+                                        </> : null
+                                }
+
                                 <button type='button' onClick={() => signOut()} className='outline_btn'>
                                     Sign Out
                                 </button>
@@ -69,14 +82,27 @@ export default function Navbar() {
 
                         {toggleDropdown && (
                             <div className='dropdown'>
+                                {
+                                    session.user.role !== Role.USER ?
+                                        <>
+                                            <Link href='/hama' onClick={() => setToggleDropdown(false)} className={`dropdown_link ${pathname === '/hama' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
+                                                Hama
+                                            </Link>
 
+                                            <Link href='/evidence' onClick={() => setToggleDropdown(false)} className={`dropdown_link ${pathname === '/evidence' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
+                                                Evidence
+                                            </Link>
 
-                                <Link href='/evidence' onClick={() => setToggleDropdown(false)} className={`dropdown_link ${pathname === '/evidence' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
-                                    Evidence
-                                </Link>
-                                <Link href='/hama' onClick={() => setToggleDropdown(false)} className={`dropdown_link ${pathname === '/hama' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
-                                    Hama
-                                </Link>
+                                            <Link href='/user' onClick={() => setToggleDropdown(false)} className={` dropdown_link ${pathname === '/user' || pathname === '/user/create' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
+                                                Pengguna
+                                            </Link>
+                                            <Link href='/konsultasi' onClick={() => setToggleDropdown(false)} className={`dropdown_link ${pathname === '/konsultasi' ? 'orange_gradient border-b-2 border-orange-400 font-medium' : ''}`}>
+                                                Konsultasi
+                                            </Link>
+                                        </> :
+                                        null
+                                }
+
                                 <button
                                     type='button'
                                     onClick={() => {

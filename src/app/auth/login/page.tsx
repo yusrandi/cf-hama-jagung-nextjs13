@@ -30,9 +30,17 @@ export default function LoginPage() {
                 {
                     signInClicked ? <Loading /> :
 
-                        <button type='button' className='outline_btn' onClick={handleSUbmit}>
-                            Sign In
-                        </button>
+                        <view className='text-center'>
+                            <button type='button' className='outline_btn mb-5' onClick={handleSUbmit}>
+                                Sign In
+                            </button>
+                            <div>
+                                or
+                            </div>
+                            <Link href='/register' className='text-blue-600'>
+                                Create an account
+                            </Link>
+                        </view>
                 }
 
             </div>

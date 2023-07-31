@@ -2,10 +2,10 @@
 # HAMA
 
 ###
-GET http://localhost:3000/api/hama
+GET http://hamajagung.cloud/api/hama
 
 ###
-POST http://localhost:3000/api/hama
+POST http://hamajagung.cloud/api/hama
 Content-Type: application/json
 
 {
@@ -14,12 +14,12 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/api/hama/1
+GET http://hamajagung.cloud/api/hama/1
 ###
-DELETE  http://localhost:3000/api/hama/3
+DELETE  http://hamajagung.cloud/api/hama/3
 
 ###
-PATCH  http://localhost:3000/api/hama/1
+PATCH  http://hamajagung.cloud/api/hama/1
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/register
+POST http://hamajagung.cloud/api/register
 Content-Type: application/json
 
 {
@@ -38,16 +38,16 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/login
+POST http://hamajagung.cloud/api/login
 Content-Type: application/json
 
 {
-    "username": "use@use.use",
+    "email": "use@use.use",
     "password": "1sampai8"
 }
 
 ###
-POST http://localhost:3000/api/post
+POST http://hamajagung.cloud/api/post
 Content-Type: application/json
 
 {
@@ -55,7 +55,7 @@ Content-Type: application/json
     "authorId": 1
 }
 ###
-PATCH    http://localhost:3000/api/kerusakan/8
+PATCH    http://hamajagung.cloud/api/kerusakan/8
 Content-Type: application/json
 
 {
@@ -64,18 +64,47 @@ Content-Type: application/json
 }
 
 ###
-DELETE    http://localhost:3000/api/kerusakan/K003
+GET http://hamajagung.cloud/api/evidence
 
 # EVIDENCE
 
 ###
-GET  http://localhost:3000/api/evidence
+GET  http://hamajagung.cloud/api/evidence
 ###
-POST    http://localhost:3000/api/evidence
+POST    http://hamajagung.cloud/api/evidence
 Content-Type: application/json
 
 {
     "evidenceCode": "G2",
     "evidenceName": "Gejala 2",
     "evidenceBobot": "0.8"
+}
+
+# USER
+###
+GET http://hamajagung.cloud/api/user
+
+###
+PATCH  http://hamajagung.cloud/api/user/2
+Content-Type: application/json
+
+{
+    "name": "user update",
+    "email": "user@use.use update",
+    "password": "1sampai8",
+    "role": "ADMIN"
+}
+
+# LAPORAN
+###
+GET   http://hamajagung.cloud/api/laporan
+
+###
+POST http://hamajagung.cloud/api/laporan
+Content-Type: application/json
+
+{
+    "userName": "user Name update",
+    "hamaName": "Hama Name update",
+    "cf": "96 96"
 }

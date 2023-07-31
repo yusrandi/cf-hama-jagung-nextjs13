@@ -13,7 +13,7 @@ const handler = NextAuth({
       },
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
-        const res = await fetch("http://localhost:3000/api/login", {
+        const res = await fetch("http://hamajagung.cloud/api/login", {
           method: "POST",
           headers: {
             "Content-Type": "Application/json"
@@ -28,13 +28,13 @@ const handler = NextAuth({
   
         if (user) {
           // Any object returned will be saved in `user` property of the JWT
-          if (user.role !== 'USER') {
-            return user
+          return user
+          // if (user.role !== 'USER') {
             
-          }else{
-            throw new Error('Unauthorized.')
+          // }else{
+          //   throw new Error('Unauthorized.')
 
-          }
+          // }
         } else {
           // If you return null then an error will be displayed advising the user to check their details.
           throw new Error('Incorrect username or password.')

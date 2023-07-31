@@ -16,8 +16,9 @@ const emptyHama: Hama = {
     hamaCode: '',
     hamaName: '',
     createdAt: null,
-    updatedAt: null
-
+    updatedAt: null,
+    evidences: [],
+    image: null
 }
 
 export default function CreateHamaPage() {

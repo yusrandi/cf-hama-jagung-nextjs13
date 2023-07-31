@@ -17,16 +17,20 @@ import { Hama } from 'prisma/prisma-client';
 import { DataTable } from "primereact/datatable";
 import { Column } from 'primereact/column';
 import { Toast } from "primereact/toast";
+import { HamaService } from './service';
+import CustomFileSelector from '@/components/CustomFileSelector';
+import ImagePreview from '@/components/ImagePreview';
 
 
 
-export const emptyHama: Hama = {
+const emptyHama: Hama = {
     id: 0,
     hamaCode: '',
     hamaName: '',
     evidences: [],
     createdAt: null,
     updatedAt: null,
+    image: null
 }
 
 
@@ -42,6 +46,8 @@ export default function HamaPage() {
 
     const [errorCode, setErrorCode] = useState(false)
     const [errorName, setErrorName] = useState(false)
+    const [errorImage, setErrorImage] = useState(false)
+
 
     const [isLoading, setLoading] = useState<boolean>(true)
 
@@ -50,6 +56,16 @@ export default function HamaPage() {
     const toast = useRef<Toast>(null);
     const [deleteHamaDialog, setDeleteHamaDialog] = useState(false);
 
+    const [image, setImage] = useState<File>();
+    const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            //convert `FileList` to `File[]`
+            const _files = e.target.files[0];
+            console.log({ _files });
+            setImage(_files);
+            setErrorImage(false)
+        }
+    };
 
 
 
@@ -57,11 +73,9 @@ export default function HamaPage() {
     async function getHamas() {
         try {
             setLoading(true)
-
-            const result = await fetch('http://localhost:3000/api/hama', { headers: { 'Cache-Control': 'no-cache' } })
+            const result = await fetch('/api/hama', { headers: { 'Cache-Control': 'no-cache' } })
                 .then((res) => res.json());
             console.log(result.responsedata);
-
             setHamas(result.responsedata)
             setLoading(false)
 
@@ -80,10 +94,20 @@ export default function HamaPage() {
         e.preventDefault()
         setErrorCode(false)
         setErrorName(false)
+        setErrorImage(false)
 
         // setSubmitted(true);
 
         console.log({ hama });
+        console.log({ image });
+
+        if (title === 'Create') {
+            if (image === undefined) {
+                setErrorImage(true)
+                return
+            }
+        }
+
         if (hama.hamaCode === '') {
             setErrorCode(true)
             return
@@ -93,49 +117,87 @@ export default function HamaPage() {
             return
         }
 
-        let api: string = 'http://localhost:3000/api/hama'
-        let method: string = 'POST'
+        setSubmitted(true);
+        setLoading(true)
 
-        if (title === 'Update') {
-            api = `http://localhost:3000/api/hama/${hama.id}`
-            method = 'PATCH'
-
+        if (title === 'Create') {
+            handleCreate()
+        } else {
+            handleUpdate()
         }
 
+
+        // let api: string = '/api/hama'
+        // let method: string = 'POST'
+
+        // if (title === 'Update') {
+        //     api = `/api/hama/${hama.id}`
+        //     method = 'PATCH'
+
+        // }
+
+        // try {
+        //     setSubmitted(true);
+
+        //     const result = await fetch(api, {
+        //         method: method,
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify({
+        //             hamaCode: hama.hamaCode,
+        //             hamaName: hama.hamaName,
+        //         }),
+        //     }).then((res) => res.json());
+
+        //     setHamaDialog(false);
+
+        //     setHamas(result.responsedata)
+        //     setSubmitted(false);
+        //     toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Hama Created', life: 3000 });
+
+
+
+        // } catch (error) {
+        //     console.log(error);
+        // }
+
+        setHamaDialog(false)
+        setSubmitted(false)
+
+    }
+
+    async function handleCreate() {
         try {
-            setSubmitted(true);
-
-            const result = await fetch(api, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    hamaCode: hama.hamaCode,
-                    hamaName: hama.hamaName,
-                }),
-            }).then((res) => res.json());
-
-            setHamaDialog(false);
-
-            setHamas(result.responsedata)
-            setSubmitted(false);
-            toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Hama Created', life: 3000 });
-
-
+            await HamaService.createData(hama, image!).then((data) => {
+                console.log({ data });
+                setHamas(data.data.responsedata)
+                setLoading(false)
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Hama Created', life: 3000 });
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    async function handleUpdate() {
+        try {
+            await HamaService.updateData(hama, image!).then((data) => {
+                console.log({ data });
+                setHamas(data.data.responsedata)
+                setLoading(false)
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Hama Updated', life: 3000 });
+            })
 
         } catch (error) {
             console.log(error);
         }
-
-
     }
     async function deleteHama() {
         console.log({ hama });
 
         try {
 
-            const api = `http://localhost:3000/api/hama/${hama.id}`
+            const api = `/api/hama/${hama.id}`
             const method = 'DELETE'
 
             const result = await fetch(api, {
@@ -150,10 +212,6 @@ export default function HamaPage() {
             setDeleteHamaDialog(false);
 
             toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Hama Deleted', life: 3000 });
-
-
-
-
         } catch (error) {
 
         }
@@ -170,6 +228,7 @@ export default function HamaPage() {
         setHamaDialog(false);
         setErrorCode(false)
         setErrorName(false)
+        setErrorImage(false)
     };
     const hideDeleteHamaDialog = () => {
         setDeleteHamaDialog(false);
@@ -177,7 +236,7 @@ export default function HamaPage() {
 
     const hamaDialogFooter = (
         <>
-            <Button severity="danger" label="Cancel" icon="pi pi-times" text onClick={hideDialog} />
+            <Button severity="danger" label="Batal" icon="pi pi-times" text onClick={hideDialog} />
             <Button label={submitted ? `Submiting...` : 'Submit'} icon="pi pi-check" text disabled={submitted} onClick={handleSubmit} />
         </>
     );
@@ -190,13 +249,25 @@ export default function HamaPage() {
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Manage Hamas</h5>
+            <h5 className="m-0"></h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onInput={(e) => setGlobalFilter(e.currentTarget.value)} placeholder="Search..." />
             </span>
         </div>
     );
+
+    function imageBodyTemplate(rowData: Hama) {
+        return (
+            <>
+                <span className="p-column-title">Gambar</span>
+                {/* {rowData.image} */}
+
+                {rowData.image && <img src={`http://hamajagung.cloud/hamas/${rowData.image}`} alt={rowData.image} width="50" className="mt-0 mx-auto mb-5 block shadow-2" />}
+
+            </>
+        );
+    };
 
     const codeBodyTemplate = (rowData: Hama) => {
         return (
@@ -234,6 +305,7 @@ export default function HamaPage() {
         setTitle('Update')
         setHama({ ...hama });
         setHamaDialog(true);
+        setImage(undefined)
     };
 
     const confirmDeleteHama = (hama: Hama) => {
@@ -247,9 +319,9 @@ export default function HamaPage() {
                 <h1 className='head_text text-left'>
                     <span className='blue_gradient'>Data Hama</span>
                 </h1>
-                <p className='desc text-left'>disini detail hama jagung</p>
+                {/* <p className='desc text-left'>disini detail hama jagung</p> */}
 
-                <button className='outline_btn mt-6' onClick={() => openNew()} >Create Data </button>
+                <button className='outline_btn mt-6' onClick={() => openNew()} >Tambah Data </button>
 
                 <Toast ref={toast} />
 
@@ -270,6 +342,7 @@ export default function HamaPage() {
                     header={header}
                     responsiveLayout="scroll"
                 >
+                    <Column field="image" header="Gambar" sortable body={imageBodyTemplate}></Column>
                     <Column field="hamaCode" header="Kode Hama" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     <Column field="hamaName" header="Nama Hama" sortable body={nameBodyTemplate} ></Column>
                     <Column field="total" header="total" sortable body={totalBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
@@ -281,10 +354,26 @@ export default function HamaPage() {
                     {/* {product.image && <img src={`/demo/images/product/${product.image}`} alt={product.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />} */}
 
                     <h1 className='head_text text-left'>
-                        <span className='blue_gradient'>{title} Hama</span>
+                        <span className='blue_gradient'>{title === 'Create' ? 'Tambah' : 'Ubah'} Hama</span>
                     </h1>
 
                     <form onSubmit={handleSubmit} className='mt-10 w-full max-w-2xl flex flex-col gap-5 '>
+
+                        <CustomFileSelector
+                            accept="image/png, image/jpeg, image/jpg"
+                            onChange={handleFileSelected}
+                        />
+                        {
+                            errorImage ? <span className='text-xs text-red-500'>
+                                pilih gambar dulu
+                            </span> : null
+                        }
+
+                        {/* {
+                            image !== undefined ?
+                                <ImagePreview image={image!} /> : null
+                        } */}
+
                         <label>
                             <span className='font-satoshi font-semibold text-base text-gray-700'>
                                 Kode hama{" "}
@@ -334,7 +423,7 @@ export default function HamaPage() {
                 <Dialog visible={deleteHamaDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteHamaDialogFooter} onHide={hideDeleteHamaDialog}>
                     <div className="flex align-items-center justify-content-center">
                         <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                        {hama && <span>Are you sure you want to delete the selected hama?</span>}
+                        {hama && <span>anda yakin ingin menghapus hama {hama.hamaName}?</span>}
                     </div>
                 </Dialog>
 

@@ -1,51 +1,79 @@
-import { Evidence } from "prisma/prisma-client";
+import { Hama } from "prisma/prisma-client";
+import axios from 'axios'
 
 export const HamaService = {
     async getData() {
         return await fetch('/api/hama', { headers: { 'Cache-Control': 'no-cache' } })
             .then((res) => res.json());
     },
-    async createData(evidence: Evidence) {
-        return await fetch('/api/evidence',
-            {
-                headers: {
-                    'Cache-Control': 'no-cache',
-                    'Content-Type': 'application/json'
+    async createData(hama: Hama, file: File) {
+        const formData = new FormData()
+        formData.append("hamaCode", hama.hamaCode?.toString()!)
+        formData.append("hamaName", hama.hamaName?.toString()!)
+        formData.append("image", file)
 
-                },
-                method: 'POST',
-                body: JSON.stringify({
-                    evidenceCode: evidence.evidenceCode,
-                    evidenceName: evidence.evidenceName,
-                    evidenceBobot: evidence.evidenceBobot,
-                }),
-            }
+        return await axios.post('/api/hama', formData);
+        // return await fetch('/api/evidence',
+        //     {
+        //         headers: {
+        //             'Cache-Control': 'no-cache',
+        //             'Content-Type': 'application/json'
 
-        )
-            .then((res) => res.json());
+        //         },
+        //         method: 'POST',
+        //         body: JSON.stringify({
+        //             evidenceCode: evidence.evidenceCode,
+        //             evidenceName: evidence.evidenceName,
+        //             evidenceBobot: evidence.evidenceBobot,
+        //         }),
+        //     }
+
+        // )
+        //     .then((res) => res.json());
     },
-    async updateData(evidence: Evidence) {
-        return await fetch(`/api/evidence/${evidence.id}`,
-            {
-                headers: {
-                    'Cache-Control': 'no-cache',
-                    'Content-Type': 'application/json'
+    async updateData(hama: Hama, file: File) {
 
-                },
-                method: 'PATCH',
-                body: JSON.stringify({
-                    evidenceCode: evidence.evidenceCode,
-                    evidenceName: evidence.evidenceName,
-                    evidenceBobot: evidence.evidenceBobot,
-                }),
-            }
+        console.log({file});
 
-        )
-            .then((res) => res.json());
+        let status: number = 0
+        if (file !== undefined) {
+            console.log("not undefined");
+            status = 1
+        } else {
+            status = 0
+            console.log("defined");
+        }
+
+        const formData = new FormData()
+        formData.append("id", hama.id.toString())
+        formData.append("hamaCode", hama.hamaCode!)
+        formData.append("hamaName", hama.hamaName!)
+        formData.append("image", file)
+        formData.append("status", status.toString())
+
+        return await axios.patch(`/api/hama/${hama.id}`, formData);
+
+        // return await fetch(`/api/hama/${hama.id}`,
+        //     {
+        //         headers: {
+        //             'Cache-Control': 'no-cache',
+        //             'Content-Type': 'application/json'
+
+        //         },
+        //         method: 'PATCH',
+        //         body: JSON.stringify({
+        //             evidenceCode: evidence.evidenceCode,
+        //             evidenceName: evidence.evidenceName,
+        //             evidenceBobot: evidence.evidenceBobot,
+        //         }),
+        //     }
+
+        // )
+        //     .then((res) => res.json());
     },
 
-    async deleteData(evidence: Evidence) {
-        return await fetch(`/api/evidence/${evidence.id}`,
+    async deleteData(hama: Hama) {
+        return await fetch(`/api/hama/${hama.id}`,
             {
                 headers: {
                     'Cache-Control': 'no-cache',

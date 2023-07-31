@@ -14,7 +14,19 @@ import Loading from '@/components/loading'
 import { Dialog } from 'primereact/dialog'
 import { HamaService } from '../hama/service'
 import { KeyakinanType, ListKeyakinan } from '@/type/keyakinan-type'
-import { emptyHama } from '../hama/page'
+import CustomFileSelector from '@/components/CustomFileSelector'
+import ImagePreview from '@/components/ImagePreview'
+
+
+const emptyHama: Hama = {
+    id: 0,
+    hamaCode: '',
+    hamaName: '',
+    evidences: [],
+    createdAt: null,
+    updatedAt: null,
+    image: null
+}
 
 const emptyEvidence: Evidence = {
     id: 0,
@@ -23,9 +35,11 @@ const emptyEvidence: Evidence = {
     evidenceBobot: '',
     hamaId: 0,
     hama: emptyHama,
+    image: '',
     createdAt: null,
     updatedAt: null,
 }
+
 export default function HamaPage() {
 
     const toast = useRef<Toast>(null);
@@ -47,9 +61,21 @@ export default function HamaPage() {
     const [errorCode, setErrorCode] = useState(false)
     const [errorName, setErrorName] = useState(false)
     const [errorBobot, setErrorBobot] = useState(false)
+    const [errorImage, setErrorImage] = useState(false)
 
     const [hamas, setHamas] = useState<Hama[]>([])
     const [keyakinans, setKeyakinans] = useState<KeyakinanType[]>(ListKeyakinan)
+
+    const [image, setImage] = useState<File>();
+    const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            //convert `FileList` to `File[]`
+            const _files = e.target.files[0];
+            console.log({ _files });
+            setImage(_files);
+            setErrorImage(false)
+        }
+    };
 
 
 
@@ -72,6 +98,7 @@ export default function HamaPage() {
     function openNew() {
         setTitle('Create')
         setEvidence(emptyEvidence)
+        setImage(undefined)
         setSubmitted(false);
         setEvidenceDialog(true);
     };
@@ -83,13 +110,25 @@ export default function HamaPage() {
         setErrorCode(false)
         setErrorName(false)
         setErrorBobot(false)
+        setErrorImage(false)
     };
 
+    function imageBodyTemplate(rowData: Evidence) {
+        return (
+            <>
+                <span className="p-column-title">Gambar</span>
+                {/* {rowData.image} */}
+
+                {rowData.image && <img src={`/evidences/${rowData.image}`} alt={rowData.image} width="50" className="mt-0 mx-auto mb-5 block shadow-2" />}
+
+            </>
+        );
+    };
     function hamaBodyTemplate(rowData: Evidence) {
         return (
             <>
                 <span className="p-column-title">Nama Hama</span>
-                {rowData.hama.hamaName}
+                {rowData!.hama!.hamaName}
             </>
         );
     };
@@ -141,6 +180,7 @@ export default function HamaPage() {
         setTitle('Update')
         setEvidence({ ...evidence });
         setEvidenceDialog(true);
+        setImage(undefined)
     };
 
     function confirmDeleteEvidence(evidence: Evidence) {
@@ -150,7 +190,7 @@ export default function HamaPage() {
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Manage Evidences</h5>
+            <h5 className="m-0"></h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onInput={(e) => setGlobalFilter(e.currentTarget.value)} placeholder="Search..." />
@@ -176,6 +216,7 @@ export default function HamaPage() {
                 header={header}
                 responsiveLayout="scroll"
             >
+                <Column field="image" header="Gambar" sortable body={imageBodyTemplate}></Column>
                 <Column field="hamaName" header="Nama Hama " sortable body={hamaBodyTemplate} ></Column>
                 <Column field="evidenceCode" header="Kode " sortable body={codeBodyTemplate} ></Column>
                 <Column field="evidenceName" header="Nama Evidence" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
@@ -212,9 +253,9 @@ export default function HamaPage() {
 
     async function handleCreate() {
         try {
-            await EvidenceService.createData(evidence).then((data) => {
+            await EvidenceService.createData(evidence, image!).then((data) => {
                 console.log({ data });
-                setEvidences(data.responsedata)
+                setEvidences(data.data.responsedata)
                 setLoading(false)
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Evidence Created', life: 3000 });
             })
@@ -224,9 +265,9 @@ export default function HamaPage() {
     }
     async function handleUpdate() {
         try {
-            await EvidenceService.updateData(evidence).then((data) => {
+            await EvidenceService.updateData(evidence, image!).then((data) => {
                 console.log({ data });
-                setEvidences(data.responsedata)
+                setEvidences(data.data.responsedata)
                 setLoading(false)
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Evidence Updated', life: 3000 });
             })
@@ -241,8 +282,17 @@ export default function HamaPage() {
         setErrorCode(false)
         setErrorName(false)
         setErrorBobot(false)
+        setErrorImage(false)
 
         console.log({ evidence });
+        console.log({ image });
+
+        if (title === 'Create') {
+            if (image === undefined) {
+                setErrorImage(true)
+                return
+            }
+        }
 
         if (evidence.hamaId === 0) {
             setErrorHamaId(true)
@@ -262,6 +312,7 @@ export default function HamaPage() {
         }
 
         setSubmitted(true);
+        setLoading(true)
 
         if (title === 'Create') {
             handleCreate()
@@ -284,12 +335,9 @@ export default function HamaPage() {
                 <h1 className='head_text text-left'>
                     <span className='blue_gradient'>Data Evidence</span>
                 </h1>
-                <p className='desc text-left'>disini detail Evidence jagung</p>
+                {/* <p className='desc text-left'>disini detail Evidence jagung</p> */}
 
-                <button className='outline_btn mt-6' onClick={() => openNew()} >Create Data </button>
-
-                <Toast ref={toast} />
-
+                <button className='outline_btn mt-6' onClick={() => openNew()} >Tambah Data </button>
                 {
                     isLoading ? <Loading /> :
                         <EvidenceTable />
@@ -299,10 +347,28 @@ export default function HamaPage() {
                     {/* {product.image && <img src={`/demo/images/product/${product.image}`} alt={product.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />} */}
 
                     <h1 className='head_text text-left'>
-                        <span className='blue_gradient'>{title} Evidence</span>
+                        <span className='blue_gradient'>{title === 'Create' ? 'Tambah' : 'Ubah'} Evidence</span>
                     </h1>
 
                     <form onSubmit={handleSubmit} className='mt-10 w-full max-w-2xl flex flex-col gap-5 '>
+
+
+
+                        <CustomFileSelector
+                            accept="image/png, image/jpeg"
+                            onChange={handleFileSelected}
+                        />
+                        {
+                            errorImage ? <span className='text-xs text-red-500'>
+                                pilih gambar dulu
+                            </span> : null
+                        }
+
+                        {/* {
+                            image !== undefined ?
+                                <ImagePreview image={image!} /> : null
+                        } */}
+
                         <label>
                             <span className='font-satoshi font-semibold text-base text-gray-700'>
                                 Pilih Hama
@@ -391,19 +457,15 @@ export default function HamaPage() {
                                 </span> : null
                             }
                         </label>
-
-
                     </form>
-
                 </Dialog>
-
                 <Dialog visible={deleteEvidenceDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteHamaDialogFooter} onHide={hideDeleteEvidenceDialog}>
                     <div className="flex align-items-center justify-content-center">
                         <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                        {evidence && <span>Are you sure you want to delete the selected evidence {evidence.evidenceCode}?</span>}
+                        {evidence && <span>Anda yakin ingin menghapus Evidence  {evidence.evidenceCode}?</span>}
                     </div>
                 </Dialog>
-
+                <Toast ref={toast} />
             </section>
         </AdminLayout>
     )

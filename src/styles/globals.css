@@ -88,6 +88,9 @@
 .head_text {
   @apply mt-5 text-5xl font-extrabold leading-[1.15] text-black sm:text-6xl;
 }
+.subtitle_text {
+  @apply mt-5 text-3xl font-bold leading-[1.15] text-black sm:text-4xl;
+}
 
 .orange_gradient {
   @apply bg-gradient-to-r from-amber-500 via-orange-600 to-yellow-500 bg-clip-text text-transparent;
@@ -176,3 +179,25 @@
   @apply bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5;
 }
 
+#table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#table td, #table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#table tr:nth-child(even){background-color: #f2f2f2;}
+
+#table tr:hover {background-color: #ddd;}
+
+#table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #ff5500;
+  color: white;
+}

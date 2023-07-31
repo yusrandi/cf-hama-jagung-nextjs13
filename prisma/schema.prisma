@@ -22,14 +22,15 @@ model User {
   name      String
   password  String?
   role      Role?     @default(USER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
 }
 model Hama {
   id          Int      @id @default(autoincrement())
   hamaCode    String?  @unique
   hamaName    String?  
   evidences   Evidence[]
+  image       String? 
   createdAt   DateTime? @default(now())
   updatedAt   DateTime? @updatedAt
 }
@@ -40,6 +41,16 @@ model Evidence {
   evidenceBobot     String
   hama              Hama   @relation(fields: [hamaId], references: [id])
   hamaId            Int
+  image             String? 
+  createdAt         DateTime? @default(now())
+  updatedAt         DateTime? @updatedAt
+}
+model Laporan {
+  id                Int      @id @default(autoincrement())
+  tanggal           String   
+  userName          String   
+  hamaName          String  
+  cf                String
   createdAt         DateTime? @default(now())
   updatedAt         DateTime? @updatedAt
 }

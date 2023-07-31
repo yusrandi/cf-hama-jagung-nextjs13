@@ -25,5 +25,5 @@ export async function POST(request:Request) {
         }
 
         return new Response(JSON.stringify(result))
-    }else return new Response(JSON.stringify(null))
+    }else return new Response(JSON.stringify({'message': "Invalid username or password"}))
 }

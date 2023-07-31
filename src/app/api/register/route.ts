@@ -20,7 +20,7 @@ export async function POST(request:Request) {
     
     if (userExist) return new Response(JSON.stringify({
         responsecode : 0,
-        responsemsg : 'User Not Found',
+        responsemsg : 'User Exist',
         responsedata : {},
 
     }), {status: 400})
